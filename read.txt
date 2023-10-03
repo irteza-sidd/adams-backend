@@ -1,0 +1,23 @@
+way of populating nesting 
+
+  /*
+        //ENSURE THE WAY OF POPULATING
+        await updatedPost.populate({
+            path: 'comments',
+            populate: {
+                path: 'commentedBy',
+                select: 'name' // Specify the fields you want to include
+            }
+        });
+        //POPULATION END
+  */
+
+
+  2)
+
+  
+        const updatedPost = await Post.findByIdAndUpdate(
+            postId,
+            { $addToSet: { comments: comment } }, // Use $addToSet to prevent duplicate likes
+            { new: true } // Return the updated document
+        ).select('-comments._id -comments.createdAt -comments.updatedAt');
