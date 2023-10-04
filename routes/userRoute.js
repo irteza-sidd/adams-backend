@@ -1,8 +1,8 @@
 import express from 'express';
-import { createUser, allUsers, getUser, deleteUser, loginUser } from '../controllers/userController.mjs';
+import { createUser, allUsers, getUser, deleteUser, loginUser } from '../controllers/userController.js';
 import { initializeApp } from "firebase/app";
 import multer from "multer";
-import config from "../config/firebaseconfig.mjs";
+import config from "../config/firebaseconfig.js";
 
 initializeApp(config.firebaseConfig);
 

@@ -1,4 +1,4 @@
-import Post from "../models/postModel.mjs";
+import Post from "../models/postModel.js";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import generateUniqueFilename from "../utils/generateUniqueFilename.mjs";
 import sendResponse from "../utils/sendResponse.mjs";

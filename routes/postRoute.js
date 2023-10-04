@@ -1,9 +1,9 @@
 import express from 'express';
-import { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment } from '../controllers/postController.mjs';
-import fetchUser from '../middlewares/fetchUser.mjs';
+import { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment } from '../controllers/postController.js';
+import fetchUser from '../middlewares/fetchUser.js';
 import { initializeApp } from "firebase/app";
 import multer from "multer";
-import config from "../config/firebaseconfig.mjs";
+import config from "../config/firebaseconfig.js";
 
 
 initializeApp(config.firebaseConfig);

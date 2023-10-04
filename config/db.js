@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config();
-const connectionString = process.env.DATABASE_URL;
 const connectToMongo = () => {
-    mongoose.connect(connectionString, {
+    mongoose.connect("mongodb+srv://irtezasiddiqui:VpVIJGj5lmubKWQw@cluster0.8p8ywia.mongodb.net/ADAMSBACKEND", {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         autoIndex: true,

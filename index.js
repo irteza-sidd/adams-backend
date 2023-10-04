@@ -1,8 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import connectToMongo from './config/db.mjs';
-import userRouter from './routes/userRoute.mjs';
-import postRouter from './routes/postRoute.mjs';
+import connectToMongo from './config/db.js';
+import userRouter from './routes/userRoute.js';
+import postRouter from './routes/postRoute.js';
 import cors from 'cors'
 
 const app = express();
@@ -14,6 +14,6 @@ app.use('/adam/user', userRouter);
 app.use('/adam/post', postRouter);
 //DATABASE AND PORT CONNECTION
 connectToMongo();
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT ||3000, () => {
     console.log(`Server Running on port ${process.env.PORT}`);
 })

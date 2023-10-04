@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema(
         password: { type: "String", trim: true },
         email: { type: "String", required: true, trim: true, unique: true },
         loginOrSignupMethod: { type: String, required: true, trim: true, default: "CUSTOM" },
-        providorName:String,
+        providorName: String,
         googleId: String,
         facebookId: String,
     },

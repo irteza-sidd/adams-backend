@@ -1,5 +1,5 @@
 import axios from "axios";
-import User from "../models/userModel.mjs";
+import User from "../models/userModel.js";
 import dotenv from 'dotenv';
 import bcrypt from "bcryptjs";
 import sendResponse from "../utils/sendResponse.mjs";
