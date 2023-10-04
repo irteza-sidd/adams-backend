@@ -9,87 +9,110 @@ import generateUniqueFilename from "../utils/generateUniqueFilename.mjs";
 dotenv.config();
 
 const createUser = async (req, res) => {
-    try {
-        // Google SIGNUP
-        if (req.body.providor === "google") {
-            const { googleAccessToken } = req.body;
-            axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-                headers: {
-                    "Authorization": `Bearer ${googleAccessToken}`
-                }
-            })
-                .then(async response => {
-                    const user = {
-                        fullname: response.data.given_name + " " + response.data.family_name,
-                        email: response.data.email,
-                        image: response.data.picture ? response.data.picture : ""
-                    }
-                    let existingUser = await User.findOne({ email: user.email });
-                    if (existingUser) {
-                        const payload = {
-                            userId: existingUser._id,
-                        };
-                        const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-                        return res.status(201).send(sendResponse(true, "Successful", { user: existingUser, authToken }));
-                    }
-                    const googleUser = await User.create({
-                        name: user.fullname,
-                        email: user.email,
-                        image: user.image,
-                        loginOrSignupMethod: "SOCIAL",
-                        googleId: response.data.sub,
-                        providorName: "GOOGLE",
-                    })
-                    const payload = {
-                        userId: googleUser._id,
-                    };
-                    const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-                    res.status(201).send(sendResponse(true, "Successful", { googleUser, authToken }));
-                }).catch(err => {
-                    res.status(500).json({ success: false, message: err.message });
-                })
-        }
-
-        //CUSTOM USER SIGNUP
-        else {
-            const { name, confirmPassword, password, email } = req.body;
+    // Google SIGNUP
+    /*   if (req.body.providor === "GOOGLE") {
+           const { googleAccessToken } = req.body;
+           axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+               headers: {
+                   "Authorization": `Bearer ${googleAccessToken}`
+               }
+           })
+               .then(async response => {
+                   const user = {
+                       fullname: response.data.given_name + " " + response.data.family_name,
+                       email: response.data.email,
+                       image: response.data.picture ? response.data.picture : ""
+                   }
+                   let existingUser = await User.findOne({ email: user.email });
+                   if (existingUser) {
+                       const payload = {
+                           userId: existingUser._id,
+                       };
+                       const authToken = jwt.sign(payload, process.env.JWT_SECRET);
+                       return res.status(201).send(sendResponse(true, "Successful", { user: existingUser, authToken }));
+                   }
+                   const googleUser = await User.create({
+                       name: user.fullname,
+                       email: user.email,
+                       image: user.image,
+                       loginOrSignupMethod: "SOCIAL",
+                       googleId: response.data.sub,
+                       providorName: "GOOGLE",
+                   })
+                   const payload = {
+                       userId: googleUser._id,
+                   };
+                   const authToken = jwt.sign(payload, process.env.JWT_SECRET);
+                   res.status(201).send(sendResponse(true, "Successful", { googleUser, authToken }));
+               }).catch(err => {
+                   res.status(500).json({ success: false, message: err.message });
+               })
+       }
+*/
+    if (req.body.providor === "GOOGLE") {
+        try {
+            const { providor, name, email, providerId } = req.body;
             let existingUser = await User.findOne({ email: email });
-            if (existingUser) return res.status(409).send(sendResponse(false, "User Already Exist"));
-            let downloadURL = null
-            if (req.file) {
-
-                //USING FIREBASE STORAGE AND MULTER
-                const storage = getStorage();
-                const originalFilename = req.file.originalname;
-                const uniqueFilename = generateUniqueFilename(originalFilename);
-                const storageRef = ref(storage, `profileImages/${uniqueFilename}`);
-                const metadata = {
-                    contentType: req.file.mimetype,
+            if (existingUser) {
+                const payload = {
+                    userId: existingUser._id,
                 };
-
-                // Upload the file in the bucket storage
-                const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
-
-                downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+                const authToken = jwt.sign(payload, process.env.JWT_SECRET);
+                return res.status(201).send(sendResponse(true, "Successful", { user: existingUser, authToken }));
             }
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt); //HASH PASSWORD
-
-            const user = await User.create({
-                name, image: downloadURL, confirmPassword, password: hashedPassword, email,
-            });
-            //PROVIDING USER THE JWT TOKEN
+            const googleUser = await User.create({
+                name: name,
+                email: email,
+                loginOrSignupMethod: "SOCIAL",
+                googleId: providerId,
+                providorName: "GOOGLE",
+            })
             const payload = {
-                userId: user._id,
+                userId: googleUser._id,
             };
             const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-            return res.status(201).send(sendResponse(true, "Signup Successful", { user, authToken }));
+            res.status(201).send(sendResponse(true, "Successful", { googleUser, authToken }));
         }
-    } catch (error) {
-        console.log(error);
+        catch (error) {
+            res.json(error)
+        }
     }
 
+    //CUSTOM USER SIGNUP
+    else {
+        const { name, confirmPassword, password, email } = req.body;
+        let existingUser = await User.findOne({ email: email });
+        if (existingUser) return res.status(409).send(sendResponse(false, "User Already Exist"));
+        let downloadURL = null
+        if (req.file) {
 
+            //USING FIREBASE STORAGE AND MULTER
+            const storage = getStorage();
+            const originalFilename = req.file.originalname;
+            const uniqueFilename = generateUniqueFilename(originalFilename);
+            const storageRef = ref(storage, `profileImages/${uniqueFilename}`);
+            const metadata = {
+                contentType: req.file.mimetype,
+            };
+
+            // Upload the file in the bucket storage
+            const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+
+            downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt); //HASH PASSWORD
+
+        const user = await User.create({
+            name, image: downloadURL, confirmPassword, password: hashedPassword, email,
+        });
+        //PROVIDING USER THE JWT TOKEN
+        const payload = {
+            userId: user._id,
+        };
+        const authToken = jwt.sign(payload, process.env.JWT_SECRET);
+        return res.status(201).send(sendResponse(true, "Signup Successful", { user, authToken }));
+    }
 }
 
 const allUsers = async (req, res) => {
