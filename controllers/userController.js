@@ -49,7 +49,7 @@ const createUser = async (req, res) => {
                })
        }
 */
-    if (req.body.providor === "GOOGLE") {
+    if (req.body.provider === "GOOGLE") {
         try {
             const { providor, name, email, providerId } = req.body;
             let existingUser = await User.findOne({ email: email });

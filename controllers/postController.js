@@ -4,28 +4,33 @@ import generateUniqueFilename from "../utils/generateUniqueFilename.mjs";
 import sendResponse from "../utils/sendResponse.mjs";
 
 const createPost = async (req, res) => {
-    const { type, description } = req.body;
-    let downloadURL = null
-    if (req.file) {
-
-        //USING FIREBASE STORAGE AND MULTER
-        const storage = getStorage();
-        const originalFilename = req.file.originalname;
-        const uniqueFilename = generateUniqueFilename(originalFilename);
-        const storageRef = ref(storage, `posts/${uniqueFilename}`);
-        const metadata = {
-            contentType: req.file.mimetype,
-        };
-
-        // Upload the file in the bucket storage
-        const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
-
-        downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+    try {
+        const { type, description } = req.body;
+        let downloadURL = null
+        if (req.file) {
+    
+            //USING FIREBASE STORAGE AND MULTER
+            const storage = getStorage();
+            const originalFilename = req.file.originalname;
+            const uniqueFilename = generateUniqueFilename(originalFilename);
+            const storageRef = ref(storage, `posts/${uniqueFilename}`);
+            const metadata = {
+                contentType: req.file.mimetype,
+            };
+    
+            // Upload the file in the bucket storage
+            const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+    
+            downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+        }
+        const post = await Post.create({
+            authorId: req.user, type, url: downloadURL, description
+        });
+        res.json({ post })
+    } catch (error) {
+        console.log(error);
     }
-    const post = await Post.create({
-        authorId: req.user, type, url: downloadURL, description
-    })
-    res.json({ post })
+   
 }
 const getUserPosts = async (req, res) => {
     const user = req.user;
