@@ -1,11 +1,11 @@
 export default {
-  firebaseConfig: {
-    apiKey: "AIzaSyA6L3TyZy3BwGf-6Lkz6czBcucZjmbLRzk",
-    authDomain: "nodejsfileupload-2ac7e.firebaseapp.com",
-    projectId: "nodejsfileupload-2ac7e",
-    storageBucket: "nodejsfileupload-2ac7e.appspot.com",
-    messagingSenderId: "945639447808",
-    appId: "1:945639447808:web:72b9ffb122be42d4e5a7e5",
-    measurementId: "G-HV6N7QE5P1"
+   firebaseConfig : {
+    apiKey: "AIzaSyDfxsZT6WBllukx32WyiivCU3VD_t4FJMk",
+    authDomain: "adamsbackend.firebaseapp.com",
+    projectId: "adamsbackend",
+    storageBucket: "adamsbackend.appspot.com",
+    messagingSenderId: "509444456627",
+    appId: "1:509444456627:web:35f7edbf54743ef6d4b0c6",
+    measurementId: "G-S6GKHK5J2B"
   }
 }
