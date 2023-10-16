@@ -1,14 +1,14 @@
 import Post from "../models/postModel.js";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
-import generateUniqueFilename from "../utils/generateUniqueFilename.mjs";
-import sendResponse from "../utils/sendResponse.mjs";
+import generateUniqueFilename from "../utils/generateUniqueFilename.js";
+import sendResponse from "../utils/sendResponse.js";
 
 const createPost = async (req, res) => {
     try {
         const { type, description } = req.body;
         let downloadURL = null
         if (req.file) {
-    
+
             //USING FIREBASE STORAGE AND MULTER
             const storage = getStorage();
             const originalFilename = req.file.originalname;
@@ -17,10 +17,10 @@ const createPost = async (req, res) => {
             const metadata = {
                 contentType: req.file.mimetype,
             };
-    
+
             // Upload the file in the bucket storage
             const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
-    
+
             downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
         }
         const post = await Post.create({
@@ -30,7 +30,7 @@ const createPost = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-   
+
 }
 const getUserPosts = async (req, res) => {
     const user = req.user;

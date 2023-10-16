@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import sendResponse from '../utils/sendResponse.mjs';
+import sendResponse from '../utils/sendResponse.js';
 
 dotenv.config();
 

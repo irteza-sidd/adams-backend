@@ -14,6 +14,6 @@ userRouter.post('/', upload.single("image"), createUser); //SIGN UP ENDPOINT
 userRouter.post('/login', loginUser); //SIGN IN ENDPOINT
 userRouter.get('/', allUsers);  //GET ALL USERS ENDPOINT
 userRouter.get('/:userId', getUser); // GET SPECIFIC USER ENDPOINT
-userRouter.delete('/:userId', deleteUser); // DELETE SPECIFIC USER ENDPOINT
+userRouter.delete('/:userId', deleteUser); // DELETE SPECIFIC USER ENDPOINT 
 
 export default userRouter;

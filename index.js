@@ -12,6 +12,7 @@ app.use(express.json());
 
 app.use('/adam/user', userRouter);
 app.use('/adam/post', postRouter);
+
 //DATABASE AND PORT CONNECTION
 connectToMongo();
 app.listen(process.env.PORT || 3000, () => {

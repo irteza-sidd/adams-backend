@@ -2,53 +2,15 @@ import axios from "axios";
 import User from "../models/userModel.js";
 import dotenv from 'dotenv';
 import bcrypt from "bcryptjs";
-import sendResponse from "../utils/sendResponse.mjs";
+import sendResponse from "../utils/sendResponse.js";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import jwt from 'jsonwebtoken';
-import generateUniqueFilename from "../utils/generateUniqueFilename.mjs";
+import generateUniqueFilename from "../utils/generateUniqueFilename.js";
 dotenv.config();
 
 const createUser = async (req, res) => {
     // Google SIGNUP
-    /*   if (req.body.providor === "GOOGLE") {
-           const { googleAccessToken } = req.body;
-           axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-               headers: {
-                   "Authorization": `Bearer ${googleAccessToken}`
-               }
-           })
-               .then(async response => {
-                   const user = {
-                       fullname: response.data.given_name + " " + response.data.family_name,
-                       email: response.data.email,
-                       image: response.data.picture ? response.data.picture : ""
-                   }
-                   let existingUser = await User.findOne({ email: user.email });
-                   if (existingUser) {
-                       const payload = {
-                           userId: existingUser._id,
-                       };
-                       const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-                       return res.status(201).send(sendResponse(true, "Successful", { user: existingUser, authToken }));
-                   }
-                   const googleUser = await User.create({
-                       name: user.fullname,
-                       email: user.email,
-                       image: user.image,
-                       loginOrSignupMethod: "SOCIAL",
-                       googleId: response.data.sub,
-                       providorName: "GOOGLE",
-                   })
-                   const payload = {
-                       userId: googleUser._id,
-                   };
-                   const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-                   res.status(201).send(sendResponse(true, "Successful", { googleUser, authToken }));
-               }).catch(err => {
-                   res.status(500).json({ success: false, message: err.message });
-               })
-       }
-*/
+    
     if (req.body.provider === "GOOGLE") {
         try {
             const { providor, name, email, providerId } = req.body;
