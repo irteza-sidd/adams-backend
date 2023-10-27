@@ -28,6 +28,7 @@ const createPost = async (req, res) => {
         });
         res.json({ post })
     } catch (error) {
+        res.json(error);
         console.log(error);
     }
 
