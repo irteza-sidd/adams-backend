@@ -35,9 +35,9 @@ const createPost = async (req, res) => {
 const getUserPosts = async (req, res) => {
     const user = req.user;
     try {
-        const posts = await Post.find({ authorId: user })
+        const posts = await Post.find({ authorId: user });
         if (posts.length != 0) {
-            res.json({ TotalPost: posts.length, posts })
+            res.json({ TotalPost: posts.length, posts });
         }
         else {
             return res.status(404).send(sendResponse(false, "No posting yet"));

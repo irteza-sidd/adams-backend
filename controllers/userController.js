@@ -10,7 +10,6 @@ dotenv.config();
 
 const createUser = async (req, res) => {
     // Google SIGNUP
-    
     if (req.body.provider === "GOOGLE") {
         try {
             const { providor, name, email, providerId } = req.body;
