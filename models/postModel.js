@@ -19,7 +19,7 @@ const postSchema = mongoose.Schema(
     {
         authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         type: { type: String, required: true },
-        url: { type: String, required: true },
+        url: { type: String},
         description: { type: String, required: true },
         likedBy: [{
             type: mongoose.Schema.Types.ObjectId,
