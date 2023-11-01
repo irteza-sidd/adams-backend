@@ -87,7 +87,7 @@ const getUser = async (req, res) => {
 
         const user = await User.findById(userId)
         if (user) {
-            return res.status(200).send(sendResponse(true, "Authorized", { user }));
+            return res.status(200).send(sendResponse(true, "User Information", { user }));
         }
         else {
             return res.status(404).send(sendResponse(false, "Operation Failed ! User not found"));
@@ -117,6 +117,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email: email });
+        console.log(user);
         if (!user) {
 
             return res.status(404).send(sendResponse(true, "Not found"));
@@ -136,6 +137,4 @@ const loginUser = async (req, res) => {
     }
 
 }
-
-
 export { createUser, allUsers, getUser, deleteUser, loginUser }
