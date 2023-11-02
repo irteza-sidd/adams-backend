@@ -121,14 +121,12 @@ const deleteUser = async (req, res) => {
     }
 
 }
-//TODO
 const loginUser = async (req, res) => {
 
-    const { email, password } = req.body;
     try {
+        const { email, password } = req.body;
         const user = await User.findOne({ email: email });
         if (!user) {
-
             return res.status(404).send(sendResponse(true, "Not found"));
         }
         const matchPassword = await bcrypt.compare(password, user.password);

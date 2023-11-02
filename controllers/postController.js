@@ -48,7 +48,7 @@ const getUserPosts = async (req, res) => {
             res.json({ TotalPost: posts.length, posts });
         }
         else {
-            return res.status(404).send(sendResponse(false, "No posting yet"));
+            return res.status(200).send(sendResponse(true, "No posting yet"));
         }
     } catch (error) {
         console.log(error);
