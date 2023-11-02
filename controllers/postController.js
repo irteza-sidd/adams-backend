@@ -2,6 +2,7 @@ import Post from "../models/postModel.js";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import generateUniqueFilename from "../utils/generateUniqueFilename.js";
 import sendResponse from "../utils/sendResponse.js";
+import User from "../models/userModel.js";
 
 const createPost = async (req, res) => {
     try {
@@ -23,15 +24,21 @@ const createPost = async (req, res) => {
 
             downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
         }
-        const post = await Post.create({
-            authorId: req.user, type, url: downloadURL, description
-        });
-        res.json({ post })
+        const userexist = await User.findById(req.user);
+        if (userexist) {
+
+            const post = await Post.create({
+                authorId: req.user, type, url: downloadURL, description
+            });
+            res.json({ post })
+        }
+        else {
+            res.json("Invalid Token");
+        }
     } catch (error) {
         res.json(error);
         console.log(error);
     }
-
 }
 const getUserPosts = async (req, res) => {
     const user = req.user;
@@ -105,36 +112,40 @@ const getPostComments = async (req, res) => {
     }
 }
 const replyToComment = async (req, res) => {
-    const user = req.user;
-    const { postId } = req.params;
-    const { commentId, commentDescription } = req.body;
+    try {
+        const user = req.user;
+        const { postId } = req.params;
+        const { commentId, commentDescription } = req.body;
 
-    const post = await Post.findOne({ _id: postId, 'comments._id': commentId });
-    if (post) {
-        const comment = {
-            commentedBy: user,
-            commentDescription: commentDescription,
-            parentId: commentId
-        };
+        const post = await Post.findOne({ _id: postId, 'comments._id': commentId });
+        if (post) {
+            const comment = {
+                commentedBy: user,
+                commentDescription: commentDescription,
+                parentId: commentId
+            };
 
-        const updatedPost = await Post.findByIdAndUpdate(
-            postId,
-            { $addToSet: { comments: comment } }, // Use $addToSet to prevent duplicate likes
-            { new: true } // Return the updated document
-        )
-        res.json(updatedPost)
-    }
-    else {
-        res.json('not found')
+            const updatedPost = await Post.findByIdAndUpdate(
+                postId,
+                { $addToSet: { comments: comment } }, // Use $addToSet to prevent duplicate likes
+                { new: true } // Return the updated document
+            )
+            res.json(updatedPost)
+        }
+        else {
+            res.json('not found')
+        }
+    } catch (error) {
+        console.log(error);
     }
 }
 
 const getRepliesOfComment = async (req, res) => {
-    const user = req.user;
-    const { postId } = req.params;
-    const { commentId } = req.body;
 
     try {
+        const user = req.user;
+        const { postId } = req.params;
+        const { commentId } = req.body;
         // Find the post and the comment by postId and commentId
         const post = await Post.findOne({ _id: postId, 'comments._id': commentId });
         if (!post) {
@@ -170,5 +181,32 @@ const getRepliesOfComment = async (req, res) => {
     }
 };
 
+const deletePost=async(req,res)=>{
+    try {
+        
+        const user=req.user;
+        const {postId}=req.params;
+        
+        const userExists=await User.findById(req.user);
+        if(userExists){
+            const postExist=await Post.deleteOne({authorId:req.user, _id:postId });
+            console.log(postExist.deletedCount);
+            if(postExist.deletedCount==1){
+                res.status(200).json("Post Deleted");
+            }
+            else{
+                
+                res.status(404).json("Post not found");
+            }
+        }
+        else{
+            return res.status(404).json("Invalid Token")
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({error})
+    }
+}
 
-export { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment }
+
+export { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment,deletePost }

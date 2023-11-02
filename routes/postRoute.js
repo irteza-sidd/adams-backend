@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment } from '../controllers/postController.js';
+import { createPost, getUserPosts, likePost, createComment, getPostComments, replyToComment, getRepliesOfComment ,deletePost} from '../controllers/postController.js';
 import fetchUser from '../middlewares/fetchUser.js';
 import { initializeApp } from "firebase/app";
 import multer from "multer";
@@ -19,5 +19,6 @@ postRouter.post('/', upload.single("post"), fetchUser, createPost);//CREATE A PO
 postRouter.post('/interact/like/:postId', fetchUser, likePost);//LIKE A SPECIFIC POST
 postRouter.post('/interact/comment/:postId', fetchUser, createComment);//COMMENT ON A POST
 postRouter.post('/comment/reply/:postId', fetchUser, replyToComment);//REPLY TO A COMMENT
+postRouter.delete('/delete/:postId',fetchUser,deletePost)
 
 export default postRouter;

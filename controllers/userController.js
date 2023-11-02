@@ -41,45 +41,55 @@ const createUser = async (req, res) => {
 
     //CUSTOM USER SIGNUP
     else {
-        const { name, confirmPassword, password, email } = req.body;
-        let existingUser = await User.findOne({ email: email });
-        if (existingUser) return res.status(409).send(sendResponse(false, "User Already Exist"));
-        let downloadURL = null
-        if (req.file) {
+        try {
 
-            //USING FIREBASE STORAGE AND MULTER
-            const storage = getStorage();
-            const originalFilename = req.file.originalname;
-            const uniqueFilename = generateUniqueFilename(originalFilename);
-            const storageRef = ref(storage, `profileImages/${uniqueFilename}`);
-            const metadata = {
-                contentType: req.file.mimetype,
+            const { name, confirmPassword, password, email } = req.body;
+            let existingUser = await User.findOne({ email: email });
+            if (existingUser) return res.status(409).send(sendResponse(false, "User Already Exist"));
+            let downloadURL = null
+            if (req.file) {
+
+                //USING FIREBASE STORAGE AND MULTER
+                const storage = getStorage();
+                const originalFilename = req.file.originalname;
+                const uniqueFilename = generateUniqueFilename(originalFilename);
+                const storageRef = ref(storage, `profileImages/${uniqueFilename}`);
+                const metadata = {
+                    contentType: req.file.mimetype,
+                };
+
+                // Upload the file in the bucket storage
+                const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+
+                downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+            }
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt); //HASH PASSWORD
+
+            const user = await User.create({
+                name, image: downloadURL, confirmPassword, password: hashedPassword, email,
+            });
+            //PROVIDING USER THE JWT TOKEN
+            const payload = {
+                userId: user._id,
             };
-
-            // Upload the file in the bucket storage
-            const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
-
-            downloadURL = await getDownloadURL(snapshot.ref); //DOWNLOAD URL
+            const authToken = jwt.sign(payload, process.env.JWT_SECRET);
+            return res.status(201).send(sendResponse(true, "Signup Successful", { user, authToken }));
+        } catch (error) {
+            console.log(error);
         }
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt); //HASH PASSWORD
-
-        const user = await User.create({
-            name, image: downloadURL, confirmPassword, password: hashedPassword, email,
-        });
-        //PROVIDING USER THE JWT TOKEN
-        const payload = {
-            userId: user._id,
-        };
-        const authToken = jwt.sign(payload, process.env.JWT_SECRET);
-        return res.status(201).send(sendResponse(true, "Signup Successful", { user, authToken }));
     }
 }
 
 const allUsers = async (req, res) => {
-    const users = await User.find({})
-    const length = users.length;
-    res.json({ Total_users: length, users });
+    try {
+        const users = await User.find({})
+        const length = users.length;
+        res.json({ Total_users: length, users });
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 const getUser = async (req, res) => {
     try {
@@ -117,7 +127,6 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email: email });
-        console.log(user);
         if (!user) {
 
             return res.status(404).send(sendResponse(true, "Not found"));
